@@ -90,12 +90,12 @@
     border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); cursor: pointer;
   }
 
-  input[type=text], input[type=number] {
+  input[type=text] {
     width: 100%; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 8px; padding: 10px 12px; color: var(--text);
     font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px;
   }
-  input[type=text]:focus, input[type=number]:focus { border-color: var(--accent); }
+  input[type=text]:focus { border-color: var(--accent); }
 
   .btn {
     width: 100%; padding: 14px; border: none; border-radius: 10px;
@@ -124,9 +124,9 @@
     border-radius: 8px; padding: 8px 14px; color: var(--text);
     font-family: inherit; font-size: 16px; cursor: pointer;
   }
-  .date-nav-center { text-align: center; }
-  .date-nav-label { font-size: 15px; font-weight: 700; }
-  .date-nav-pnl { font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top: 2px; }
+  .date-nav-center { text-align: center; min-width: 130px; }
+  .date-nav-label { font-size: 14px; font-weight: 700; }
+  .date-nav-pnl { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 2px; }
   .date-nav-pnl.pos { color: var(--win); }
   .date-nav-pnl.neg { color: var(--loss); }
   .date-nav-pnl.neu { color: var(--muted); }
@@ -168,7 +168,6 @@
   .summary-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
   .summary-val.pos { color: var(--win); }
   .summary-val.neg { color: var(--loss); }
-  .summary-val.neu { color: var(--accent); }
 
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
   .cal-day-label { text-align: center; font-size: 11px; color: var(--muted); padding: 4px 0 8px; }
@@ -188,19 +187,8 @@
   .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .cal-nav { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--text); cursor: pointer; }
 
-  .profit-display { text-align: center; padding: 20px 0; }
-  .profit-display .big-num { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; }
-  .profit-display .big-num.pos { color: var(--win); }
-  .profit-display .big-num.neg { color: var(--loss); }
-
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
   .diff-row { font-size: 11px; text-align: right; font-family: 'JetBrains Mono', monospace; margin-top: -10px; margin-bottom: 12px; }
-
-  .info-box {
-    background: var(--surface2); border-radius: 8px; padding: 10px 12px;
-    font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.6;
-  }
-  .info-box span { color: var(--accent); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -213,7 +201,7 @@
   </div>
   <div class="card">
     <div class="card-title">銘柄名</div>
-    <input type="text" id="trade-name" placeholder="例: 曙ブレーキ / 7238" maxlength="20">
+    <input type="text" id="trade-name" placeholder="例: 7238 曙ブレーキ" maxlength="20">
   </div>
   <div class="card">
     <div class="card-title">購入価格 / 株数</div>
@@ -233,11 +221,10 @@
   <div class="card">
     <div class="card-title">初期値モード</div>
     <div class="mode-tabs">
-      <button class="mode-tab active" id="mode-tab-pct" onclick="setMode('pct')">📐 円幅指定</button>
-      <button class="mode-tab" id="mode-tab-amt" onclick="setMode('amt')">💰 金額指定</button>
+      <button class="mode-tab active" id="mode-tab-pct" onclick="setMode('pct')">📐 円幅</button>
+      <button class="mode-tab" id="mode-tab-amt" onclick="setMode('amt')">💰 金額</button>
       <button class="mode-tab" id="mode-tab-manual" onclick="setMode('manual')">✏️ 手動</button>
     </div>
-    <div class="info-box" id="mode-desc">設定画面の「円幅」をもとに自動計算</div>
   </div>
   <div class="card">
     <div class="card-title">損切り / 利確ライン</div>
@@ -257,10 +244,7 @@
 
 <!-- 銘柄一覧 -->
 <div class="page" id="page-trades">
-  <div class="header">
-    <h1>📊 TRADES</h1>
-    <div class="sub">日付別トレード一覧</div>
-  </div>
+  <div class="header"><h1>📊 TRADES</h1><div class="sub">日付別トレード一覧</div></div>
   <div class="date-nav">
     <button class="date-nav-btn" onclick="changeDate(-1)">◀</button>
     <div class="date-nav-center">
@@ -276,7 +260,7 @@
 <div class="page" id="page-calendar">
   <div class="header"><h1>📅 CALENDAR</h1><div class="sub">日別損益</div></div>
   <div class="summary-grid">
-    <div class="summary-box"><div class="summary-label">今月 合計</div><div class="summary-val neu" id="monthly-total">¥0</div></div>
+    <div class="summary-box"><div class="summary-label">今月合計</div><div class="summary-val neu" id="monthly-total">¥0</div></div>
     <div class="summary-box"><div class="summary-label">勝率</div><div class="summary-val neu" id="win-rate">-%</div></div>
   </div>
   <div class="card">
@@ -285,7 +269,7 @@
       <div class="cal-title" id="cal-title"></div>
       <button class="cal-nav" onclick="changeMonth(1)">▶</button>
     </div>
-    <div class="cal-grid" id="cal-labels">
+    <div class="cal-grid">
       <div class="cal-day-label">日</div><div class="cal-day-label">月</div><div class="cal-day-label">火</div>
       <div class="cal-day-label">水</div><div class="cal-day-label">木</div><div class="cal-day-label">金</div><div class="cal-day-label">土</div>
     </div>
@@ -295,30 +279,30 @@
 
 <!-- 設定 -->
 <div class="page" id="page-settings">
-  <div class="header"><h1>⚙️ SETTINGS</h1><div class="sub">初期値 / 成績</div></div>
+  <div class="header"><h1>⚙️ SETTINGS</h1><div class="sub">初期値設定</div></div>
   <div class="card">
-    <div class="card-title">📐 円幅モード（株価基準）</div>
+    <div class="card-title">📐 円幅設定</div>
     <div class="slider-group">
-      <div class="slider-label"><span>損切り幅</span><span class="slider-value" id="def-stop-val" style="color:var(--loss)">-15円</span></div>
+      <div class="slider-label"><span>損切り幅</span><span class="slider-value" id="def-stop-val">-15円</span></div>
       <input type="range" id="def-stop" min="1" max="100" value="15" step="1" oninput="updateDefaults()">
     </div>
     <div class="slider-group">
-      <div class="slider-label"><span>利確幅</span><span class="slider-value" id="def-target-val" style="color:var(--win)">+20円</span></div>
+      <div class="slider-label"><span>利確幅</span><span class="slider-value" id="def-target-val">+20円</span></div>
       <input type="range" id="def-target" min="1" max="200" value="20" step="1" oninput="updateDefaults()">
     </div>
   </div>
   <div class="card">
-    <div class="card-title">💰 金額モード（損益額基準）</div>
+    <div class="card-title">💰 金額設定</div>
     <div class="slider-group">
-      <div class="slider-label"><span>許容損失額</span><span class="slider-value" id="def-loss-amt-val" style="color:var(--loss)">-200円</span></div>
-      <input type="range" id="def-loss-amt" min="100" max="10000" value="200" step="100" oninput="updateDefaults()">
+      <div class="slider-label"><span>許容損失</span><span class="slider-value" id="def-loss-amt-val">-¥200</span></div>
+      <input type="range" id="def-loss-amt" min="100" max="5000" value="200" step="100" oninput="updateDefaults()">
     </div>
     <div class="slider-group">
-      <div class="slider-label"><span>目標利益額</span><span class="slider-value" id="def-profit-amt-val" style="color:var(--win)">+200円</span></div>
-      <input type="range" id="def-profit-amt" min="100" max="10000" value="200" step="100" oninput="updateDefaults()">
+      <div class="slider-label"><span>目標利益</span><span class="slider-value" id="def-profit-amt-val">+¥200</span></div>
+      <input type="range" id="def-profit-amt" min="100" max="5000" value="200" step="100" oninput="updateDefaults()">
     </div>
   </div>
-  <button class="btn btn-danger" onclick="clearAll()">全データをリセット</button>
+  <button class="btn btn-danger" onclick="clearAll()">データを全消去</button>
 </div>
 
 <nav class="nav">
@@ -338,7 +322,10 @@ let currentMode = 'pct';
 let currentDate = todayStr();
 let calMonth = new Date();
 
-function todayStr() { return new Date().toISOString().split('T')[0]; }
+function todayStr() { 
+  // 土日の場合は直前の金曜日にするなどの調整はあえてせず、表示時に飛ばす仕様
+  return new Date().toISOString().split('T')[0]; 
+}
 
 function formatDate(str) {
   const d = new Date(str + 'T00:00:00');
@@ -349,7 +336,7 @@ function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  if(btn) btn.classList.add('active');
+  if(btn) btn.classList.add('active'); else document.getElementById('nav-'+name).classList.add('active');
   if (name === 'trades') renderTrades();
   if (name === 'calendar') renderCalendar();
   if (name === 'settings') renderSettings();
@@ -367,67 +354,58 @@ function initSliders() {
   document.getElementById('shares-slider').oninput = () => { applyDefaults(); updateCost(); };
   document.getElementById('stop-slider').oninput = updateLines;
   document.getElementById('target-slider').oninput = updateLines;
-  applyDefaults();
-  updateCost();
+  applyDefaults(); updateCost();
 }
 
 function applyDefaults() {
-  const price = +document.getElementById('price-slider').value;
-  const shares = +document.getElementById('shares-slider').value;
-  document.getElementById('price-val').textContent = price + '円';
-  document.getElementById('shares-val').textContent = shares + '株';
-
+  const p = +document.getElementById('price-slider').value;
+  const s = +document.getElementById('shares-slider').value;
+  document.getElementById('price-val').textContent = p + '円';
+  document.getElementById('shares-val').textContent = s + '株';
   if (currentMode === 'pct') {
-    document.getElementById('stop-slider').value = Math.max(10, price - settings.stopPct);
-    document.getElementById('target-slider').value = price + settings.targetPct;
+    document.getElementById('stop-slider').value = Math.max(10, p - settings.stopPct);
+    document.getElementById('target-slider').value = p + settings.targetPct;
   } else if (currentMode === 'amt') {
-    const sw = Math.floor(settings.lossAmt / shares);
-    const tw = Math.ceil(settings.profitAmt / shares);
-    document.getElementById('stop-slider').value = Math.max(10, price - Math.max(1, sw));
-    document.getElementById('target-slider').value = price + Math.max(1, tw);
+    document.getElementById('stop-slider').value = Math.max(10, p - Math.floor(settings.lossAmt / s));
+    document.getElementById('target-slider').value = p + Math.ceil(settings.profitAmt / s);
   }
   updateLines();
 }
 
 function updateLines() {
-  const p = +document.getElementById('price-slider').value;
-  const s = +document.getElementById('shares-slider').value;
-  const sv = +document.getElementById('stop-slider').value;
-  const tv = +document.getElementById('target-slider').value;
+  const p = +document.getElementById('price-slider').value, s = +document.getElementById('shares-slider').value;
+  const sv = +document.getElementById('stop-slider').value, tv = +document.getElementById('target-slider').value;
   document.getElementById('stop-val').textContent = sv + '円';
   document.getElementById('target-val').textContent = tv + '円';
-  document.getElementById('stop-diff').textContent = (sv < p ? '-' : '+') + '¥' + Math.abs((sv - p) * s).toLocaleString();
-  document.getElementById('target-diff').textContent = (tv > p ? '+' : '-') + '¥' + Math.abs((tv - p) * s).toLocaleString();
+  document.getElementById('stop-diff').textContent = (sv < p ? '-' : '+') + '¥' + Math.abs((sv-p)*s).toLocaleString();
+  document.getElementById('target-diff').textContent = (tv > p ? '+' : '-') + '¥' + Math.abs((tv-p)*s).toLocaleString();
 }
 
 function updateCost() {
-  const p = +document.getElementById('price-slider').value;
-  const s = +document.getElementById('shares-slider').value;
-  document.getElementById('total-cost').textContent = '¥' + (p * s).toLocaleString();
+  document.getElementById('total-cost').textContent = '¥' + (+document.getElementById('price-slider').value * +document.getElementById('shares-slider').value).toLocaleString();
 }
 
-// 修正ポイント②：バリデーションの追加
 function addTrade() {
+  const p = +document.getElementById('price-slider').value, s = +document.getElementById('shares-slider').value;
+  const sv = +document.getElementById('stop-slider').value, tv = +document.getElementById('target-slider').value;
+  if (sv >= p || tv <= p) { alert('価格設定が正しくありません'); return; }
   const name = document.getElementById('trade-name').value.trim() || '銘柄' + (trades.length + 1);
-  const price = +document.getElementById('price-slider').value;
-  const shares = +document.getElementById('shares-slider').value;
-  const stop = +document.getElementById('stop-slider').value;
-  const target = +document.getElementById('target-slider').value;
-
-  if (stop >= price) { alert('損切り価格は買値より低く設定してください'); return; }
-  if (target <= price) { alert('利確価格は買値より高く設定してください'); return; }
-
-  trades.unshift({ id: Date.now(), name, price, shares, stop, target, result: null, pnl: null, date: todayStr() });
-  save();
-  
+  trades.unshift({ id: Date.now(), name, price: p, shares: s, stop: sv, target: tv, result: null, pnl: null, date: todayStr() });
+  save(); 
   const btn = document.querySelector('.btn-primary');
-  btn.textContent = '✓ 追加しました'; btn.style.background = 'var(--win)';
+  btn.textContent = '✓ 追加完了'; btn.style.background = 'var(--win)';
   setTimeout(() => { btn.textContent = 'トレード追加 →'; btn.style.background = ''; }, 1500);
 }
 
+// 修正：土日をスキップする日付増減ロジック
 function changeDate(dir) {
-  const d = new Date(currentDate + 'T00:00:00');
-  d.setDate(d.getDate() + dir);
+  let d = new Date(currentDate + 'T00:00:00');
+  
+  // 1日ずつ進め/戻し、土日だったらさらに繰り返す
+  do {
+    d.setDate(d.getDate() + dir);
+  } while (d.getDay() === 0 || d.getDay() === 6); // 0は日曜日、6は土曜日
+
   currentDate = d.toISOString().split('T')[0];
   renderTrades();
 }
@@ -436,78 +414,58 @@ function renderTrades() {
   const dayTrades = trades.filter(t => t.date === currentDate);
   const dayPnl = dayTrades.reduce((s, t) => s + (t.pnl || 0), 0);
   const hasResult = dayTrades.some(t => t.result);
-
+  
   document.getElementById('date-nav-label').textContent = currentDate === todayStr() ? '今日 ' + formatDate(currentDate) : formatDate(currentDate);
   const pnlEl = document.getElementById('date-nav-pnl');
   pnlEl.textContent = hasResult ? (dayPnl >= 0 ? '+' : '') + '¥' + dayPnl.toLocaleString() : (dayTrades.length ? '未決定' : '取引なし');
   pnlEl.className = 'date-nav-pnl ' + (hasResult ? (dayPnl > 0 ? 'pos' : dayPnl < 0 ? 'neg' : 'neu') : 'neu');
-
+  
   const list = document.getElementById('trades-list');
-  if (!dayTrades.length) {
-    list.innerHTML = '<div class="empty-state">取引がありません</div>';
-    return;
-  }
-
+  if (!dayTrades.length) { list.innerHTML = '<div class="empty-state">取引なし</div>'; return; }
   list.innerHTML = dayTrades.map(t => `
     <div class="trade-card ${t.result || ''}">
       <div class="trade-name">${t.name}</div>
-      <div class="trade-info">${t.price}円 × ${t.shares}株</div>
+      <div class="trade-info">${t.price}円×${t.shares}株</div>
       <div class="trade-targets">
         <div class="target-box"><div class="target-label">損切</div><div class="target-val loss">${t.stop}</div></div>
         <div class="target-box"><div class="target-label">買値</div><div class="target-val">${t.price}</div></div>
         <div class="target-box"><div class="target-label">利確</div><div class="target-val win">${t.target}</div></div>
       </div>
-      ${t.result ? `<div class="result-badge ${t.result}">${t.result === 'win' ? '✅' : '❌'} ¥${Math.abs(t.pnl).toLocaleString()}</div>` : 
-      `<div class="result-btns">
-        <button class="result-btn win-btn" onclick="setResult(${t.id},'win')">✅</button>
-        <button class="result-btn loss-btn" onclick="setResult(${t.id},'loss')">❌</button>
-      </div>`}
-      <button style="margin-top:8px;width:100%;background:none;border:none;color:var(--muted);font-size:10px;" onclick="deleteTrade(${t.id})">削除</button>
-    </div>
-  `).join('');
+      ${t.result ? `<div class="result-badge ${t.result}">${t.result==='win'?'✅':'❌'} ¥${Math.abs(t.pnl).toLocaleString()}</div>` : 
+      `<div class="result-btns"><button class="result-btn win-btn" onclick="setResult(${t.id},'win')">✅</button><button class="result-btn loss-btn" onclick="setResult(${t.id},'loss')">❌</button></div>`}
+      <button style="width:100%;background:none;border:none;color:var(--muted);font-size:10px;margin-top:8px" onclick="deleteTrade(${t.id})">削除</button>
+    </div>`).join('');
 }
 
 function setResult(id, res) {
   const t = trades.find(t => t.id === id);
-  t.result = res;
-  t.pnl = res === 'win' ? (t.target - t.price) * t.shares : (t.stop - t.price) * t.shares;
+  t.result = res; t.pnl = res === 'win' ? (t.target - t.price) * t.shares : (t.stop - t.price) * t.shares;
   save(); renderTrades();
 }
 
 function deleteTrade(id) { if(confirm('削除しますか？')) { trades = trades.filter(t => t.id !== id); save(); renderTrades(); } }
 
-// 修正ポイント④：カレンダータップで日付移動
-function jumpToDate(dateStr) {
-  currentDate = dateStr;
-  showPage('trades', document.getElementById('nav-trades'));
-}
+function jumpToDate(ds) { currentDate = ds; showPage('trades'); }
 
 function renderCalendar() {
   const y = calMonth.getFullYear(), m = calMonth.getMonth();
   document.getElementById('cal-title').textContent = `${y}年${m+1}月`;
   const dayMap = {};
   trades.forEach(t => { if(t.result) dayMap[t.date] = (dayMap[t.date] || 0) + t.pnl; });
-
-  let monthTotal = 0, winDays = 0, lossDays = 0;
+  let monthTotal = 0, winD = 0, lossD = 0;
   const monthKey = `${y}-${String(m+1).padStart(2,'0')}`;
-  Object.entries(dayMap).forEach(([d, p]) => {
-    if(d.startsWith(monthKey)) { monthTotal += p; if(p>0) winDays++; else if(p<0) lossDays++; }
-  });
-
-  const mtEl = document.getElementById('monthly-total');
-  mtEl.textContent = '¥' + monthTotal.toLocaleString();
-  mtEl.className = 'summary-val ' + (monthTotal > 0 ? 'pos' : monthTotal < 0 ? 'neg' : 'neu');
-  document.getElementById('win-rate').textContent = (winDays+lossDays) ? Math.round(winDays/(winDays+lossDays)*100)+'%' : '-%';
-
+  Object.entries(dayMap).forEach(([d, p]) => { if(d.startsWith(monthKey)) { monthTotal += p; if(p>0) winD++; else if(p<0) lossD++; } });
+  document.getElementById('monthly-total').textContent = '¥' + monthTotal.toLocaleString();
+  document.getElementById('monthly-total').className = 'summary-val ' + (monthTotal>0?'pos':monthTotal<0?'neg':'neu');
+  document.getElementById('win-rate').textContent = (winD+lossD) ? Math.round(winD/(winD+lossD)*100)+'%' : '-%';
   const first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
   let html = '';
   for (let i = 0; i < first; i++) html += '<div></div>';
   for (let d = 1; d <= last; d++) {
     const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const p = dayMap[ds];
-    html += `<div class="cal-day ${p !== undefined ? (p > 0 ? 'win-day' : 'loss-day') : ''} ${ds === todayStr() ? 'today' : ''}" onclick="jumpToDate('${ds}')">
-      <div class="day-num">${d}</div>
-      ${p !== undefined ? `<div class="day-pnl ${p>0?'pos':'neg'}">${p>0?'+':''}${Math.round(p/1000)}k</div>` : ''}
+    html += `<div class="cal-day ${p!==undefined?(p>0?'win-day':'loss-day'):''} ${ds===todayStr()?'today' : ''}" onclick="jumpToDate('${ds}')">
+      <div class="day-num">${d}</div>${p !== undefined ? `<div class="day-pnl ${p>0?'pos':'neg'}">${p>0?'+':''}${Math.round(p/1000)}k</div>` : ''}
     </div>`;
   }
   document.getElementById('cal-days').innerHTML = html;
@@ -535,7 +493,7 @@ function renderSettings() {
   updateDefaults();
 }
 
-function clearAll() { if(confirm('リセットしますか？')) { trades = []; save(); location.reload(); } }
+function clearAll() { if(confirm('全消去しますか？')) { trades = []; save(); location.reload(); } }
 function save() { localStorage.setItem('trades2', JSON.stringify(trades)); localStorage.setItem('settings2', JSON.stringify(settings)); }
 
 initSliders();
