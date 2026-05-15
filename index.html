@@ -3,676 +3,542 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>7桁ハンター</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>トレード管理 Pro</title>
 <style>
-:root {
-  --bg: #0f0f0f;
-  --surface: #1a1a1a;
-  --card: #222;
-  --border: #333;
-  --red: #ff2d2d;
-  --red-dim: rgba(255,45,45,0.12);
-  --gold: #ffcc00;
-  --gold-dim: rgba(255,204,0,0.1);
-  --text: #f5f5f5;
-  --muted: #777;
-  --radius: 14px;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { background:var(--bg); color:var(--text); font-family:'Noto Sans JP',sans-serif; min-height:100vh; padding-bottom:40px; }
-.wrap { max-width:640px; margin:0 auto; padding:24px 16px; }
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* Header */
-.header { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border); }
-.header-icon { width:48px; height:48px; background:var(--red); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
-.header-title { font-size:22px; font-weight:900; line-height:1.1; }
-.header-sub { font-size:12px; color:var(--muted); margin-top:2px; }
+  :root {
+    --bg: #0a0e14;
+    --surface: #111820;
+    --surface2: #1a2332;
+    --border: #1e2d42;
+    --accent: #00c9ff;
+    --win: #00e676;
+    --loss: #ff3d5a;
+    --text: #e0eaf8;
+    --muted: #5a7a9a;
+    --gold: #ffd700;
+  }
 
-/* Section */
-.section { background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
-.section-title { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Inputs */
-.field { margin-bottom:12px; }
-.field:last-child { margin-bottom:0; }
-.field-label { font-size:12px; color:var(--muted); margin-bottom:6px; display:block; }
-.field-row { display:flex; gap:8px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-input, textarea {
-  width:100%; background:var(--bg); border:1.5px solid var(--border); border-radius:10px;
-  color:var(--text); font-family:'Noto Sans JP',sans-serif; font-size:15px;
-  padding:12px 14px; outline:none; transition:border-color 0.2s;
-  -webkit-appearance:none; appearance:none;
-}
-input[type="number"] { font-family:'JetBrains Mono',monospace; font-size:16px; text-align:center; }
-input[type="password"] { font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:2px; }
-input:focus, textarea:focus { border-color:var(--red); box-shadow:0 0 0 3px var(--red-dim); }
-input::placeholder, textarea::placeholder { color:#444; }
-textarea { resize:none; line-height:1.7; font-size:15px; }
+  .nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+  }
+  .nav button {
+    flex: 1;
+    padding: 12px 4px 16px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 10px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color .2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .nav button.active { color: var(--accent); }
+  .nav button span.icon { font-size: 20px; }
 
-.icon-btn { min-width:48px; height:48px; background:var(--card); border:1.5px solid var(--border); border-radius:10px; color:var(--muted); font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .page { display: none; padding: 16px 16px 80px; }
+  .page.active { display: block; }
 
-.num-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.num-field { text-align:center; }
-.num-field .field-label { text-align:center; }
+  .header {
+    text-align: center;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .header h1 { font-size: 22px; font-weight: 900; letter-spacing: 2px; color: var(--accent); }
+  .header .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-.run-btn { width:100%; height:56px; background:var(--red); border:none; border-radius:var(--radius); color:white; font-family:'Noto Sans JP',sans-serif; font-weight:900; font-size:17px; letter-spacing:1px; cursor:pointer; transition:opacity 0.15s,transform 0.1s; margin-top:4px; }
-.run-btn:active { opacity:0.85; transform:scale(0.98); }
-.run-btn:disabled { background:#2a2a2a; color:#444; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
 
-/* Progress */
-.progress-section { display:none; background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
-.progress-section.visible { display:block; }
-.progress-track { background:var(--border); border-radius:99px; height:6px; margin-bottom:12px; overflow:hidden; }
-.progress-fill { height:100%; background:var(--red); border-radius:99px; width:0%; transition:width 0.4s ease; }
-.log-box { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); max-height:100px; overflow-y:auto; line-height:2; }
-.log-ok { color:#4ade80; }
-.log-hit { color:var(--gold); }
-.log-err { color:#f87171; }
+  .slider-group { margin-bottom: 16px; }
+  .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .slider-value { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent); }
 
-/* Results wrap */
-.results-wrap { display:none; }
-.results-wrap.visible { display:block; }
+  input[type=range] {
+    width: 100%; height: 4px; border-radius: 2px;
+    background: var(--border); outline: none; -webkit-appearance: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); cursor: pointer;
+  }
 
-/* Stats */
-.stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
-.stat-card { background:var(--surface); border-radius:12px; padding:14px; text-align:center; }
-.stat-num { font-family:'JetBrains Mono',monospace; font-size:28px; font-weight:700; color:var(--red); line-height:1; }
-.stat-name { font-size:11px; color:var(--muted); margin-top:4px; }
+  input[type=text], input[type=number] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; color: var(--text);
+    font-family: inherit; font-size: 15px; outline: none; margin-bottom: 12px;
+  }
+  input[type=text]:focus, input[type=number]:focus { border-color: var(--accent); }
 
-/* Number list panel */
-.numlist-panel { background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
-.numlist-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.numlist-title { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
-.copy-all-btn { font-size:12px; font-weight:700; padding:6px 14px; border-radius:99px; border:1.5px solid var(--border); background:var(--card); color:var(--muted); cursor:pointer; }
-.numlist-grid { display:flex; flex-wrap:wrap; gap:8px; }
-.numlist-pill { font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; background:var(--gold-dim); border:1.5px solid rgba(255,204,0,0.3); color:var(--gold); padding:6px 14px; border-radius:99px; cursor:pointer; text-decoration:none; display:inline-block; transition:background 0.15s,transform 0.1s; }
-.numlist-pill:hover { background:rgba(255,204,0,0.2); }
-.numlist-pill:active { transform:scale(0.95); }
+  .btn {
+    width: 100%; padding: 14px; border: none; border-radius: 10px;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px; transition: all .2s;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:active { opacity: .8; transform: scale(.98); }
+  .btn-danger { background: transparent; border: 1px solid var(--loss); color: var(--loss); margin-top: 8px; }
 
-/* Filter tabs */
-.tabs { display:flex; gap:6px; margin-bottom:12px; overflow-x:auto; padding-bottom:2px; -webkit-overflow-scrolling:touch; }
-.tab { padding:8px 16px; border-radius:99px; font-size:13px; font-weight:700; white-space:nowrap; cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--muted); flex-shrink:0; transition:all 0.15s; }
-.tab.active { background:var(--red-dim); border-color:var(--red); color:var(--red); }
-.csv-tab { padding:8px 16px; border-radius:99px; font-size:13px; font-weight:700; white-space:nowrap; cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--muted); flex-shrink:0; margin-left:auto; }
+  .mode-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .mode-tab {
+    flex: 1; padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); font-family: inherit; font-size: 12px;
+    font-weight: 700; cursor: pointer; transition: all .2s; text-align: center;
+  }
+  .mode-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
 
-/* Result cards */
-.result-card { background:var(--surface); border-radius:var(--radius); padding:14px; margin-bottom:8px; animation:up 0.25s ease both; }
-@keyframes up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-.card-top { display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; }
-.badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; white-space:nowrap; flex-shrink:0; }
-.badge-desc { background:rgba(96,165,250,0.15); color:#93c5fd; border:1px solid rgba(96,165,250,0.25); }
-.badge-comment { background:rgba(74,222,128,0.12); color:#86efac; border:1px solid rgba(74,222,128,0.2); }
-.card-video-title { font-size:12px; color:var(--muted); line-height:1.4; }
-.card-video-title a { color:#aaa; text-decoration:none; }
-.card-text { font-size:14px; line-height:1.7; color:#ccc; margin-bottom:10px; word-break:break-all; }
-.hl { font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px; color:var(--gold); background:var(--gold-dim); padding:1px 5px; border-radius:5px; border:1px solid rgba(255,204,0,0.2); cursor:pointer; text-decoration:none; }
-.hl:hover { background:rgba(255,204,0,0.2); }
-.card-nums { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
-.num-pill { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; background:var(--surface); border:1px solid var(--border); color:var(--muted); padding:4px 12px; border-radius:99px; transition:transform 0.15s; }
-.num-pill.is-new { background:var(--gold-dim); border-color:rgba(255,204,0,0.5); color:var(--gold); animation: pulse-gold 2s infinite; }
-@keyframes pulse-gold { 0% { box-shadow:0 0 0 0 rgba(255,204,0,0.4); } 70% { box-shadow:0 0 0 6px rgba(255,204,0,0); } 100% { box-shadow:0 0 0 0 rgba(255,204,0,0); } }
-.likes-chip { font-size:12px; color:var(--muted); margin-left:auto; }
+  .date-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+  }
+  .date-nav-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; color: var(--text);
+    font-family: inherit; font-size: 16px; cursor: pointer;
+  }
+  .date-nav-center { text-align: center; }
+  .date-nav-label { font-size: 15px; font-weight: 700; }
+  .date-nav-pnl { font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top: 2px; }
+  .date-nav-pnl.pos { color: var(--win); }
+  .date-nav-pnl.neg { color: var(--loss); }
+  .date-nav-pnl.neu { color: var(--muted); }
 
-/* Favorite styles */
-.fav-btn { cursor:pointer; font-size:14px; margin-left:6px; opacity:0.5; transition:opacity 0.2s, transform 0.1s; display:inline-flex; align-items:center; justify-content:center; }
-.fav-btn:hover { opacity:1; transform:scale(1.2); }
-.fav-btn.active { opacity:1; color:#ffcc00; text-shadow:0 0 8px rgba(255,204,0,0.4); }
-.numlist-pill .fav-btn { margin-left:8px; font-size:12px; }
+  .trade-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    position: relative; overflow: hidden;
+  }
+  .trade-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+  .trade-card.win::before { background: var(--win); }
+  .trade-card.loss::before { background: var(--loss); }
 
-.empty { text-align:center; padding:48px 20px; color:var(--muted); font-size:14px; line-height:2; }
+  .trade-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .trade-info { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+
+  .trade-targets { display: flex; gap: 8px; margin-bottom: 12px; }
+  .target-box { flex: 1; background: var(--surface2); border-radius: 8px; padding: 8px; text-align: center; }
+  .target-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+  .target-val { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; }
+  .target-val.win { color: var(--win); }
+  .target-val.loss { color: var(--loss); }
+
+  .result-btns { display: flex; gap: 8px; }
+  .result-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-family: inherit; font-size: 18px; cursor: pointer; }
+  .win-btn { background: rgba(0,230,118,.15); border: 1px solid var(--win); }
+  .loss-btn { background: rgba(255,61,90,.15); border: 1px solid var(--loss); }
+
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
+  }
+  .result-badge.win { background: rgba(0,230,118,.2); color: var(--win); }
+  .result-badge.loss { background: rgba(255,61,90,.2); color: var(--loss); }
+
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .summary-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .summary-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .summary-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700; }
+  .summary-val.pos { color: var(--win); }
+  .summary-val.neg { color: var(--loss); }
+  .summary-val.neu { color: var(--accent); }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-day-label { text-align: center; font-size: 11px; color: var(--muted); padding: 4px 0 8px; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-size: 12px; cursor: pointer;
+  }
+  .cal-day.has-data { background: var(--surface); border: 1px solid var(--border); }
+  .cal-day.today { border-color: var(--accent) !important; }
+  .cal-day .day-num { font-size: 12px; font-weight: 700; }
+  .cal-day .day-pnl { font-family: 'JetBrains Mono', monospace; font-size: 8px; margin-top: 1px; }
+  .cal-day .day-pnl.pos { color: var(--win); }
+  .cal-day .day-pnl.neg { color: var(--loss); }
+  .cal-day.win-day { background: rgba(0,230,118,.1); border: 1px solid rgba(0,230,118,.3); }
+  .cal-day.loss-day { background: rgba(255,61,90,.1); border: 1px solid rgba(255,61,90,.3); }
+
+  .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .cal-nav { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; color: var(--text); cursor: pointer; }
+
+  .profit-display { text-align: center; padding: 20px 0; }
+  .profit-display .big-num { font-family: 'JetBrains Mono', monospace; font-size: 36px; font-weight: 700; }
+  .profit-display .big-num.pos { color: var(--win); }
+  .profit-display .big-num.neg { color: var(--loss); }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+  .diff-row { font-size: 11px; text-align: right; font-family: 'JetBrains Mono', monospace; margin-top: -10px; margin-bottom: 12px; }
+
+  .info-box {
+    background: var(--surface2); border-radius: 8px; padding: 10px 12px;
+    font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.6;
+  }
+  .info-box span { color: var(--accent); font-weight: 700; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
+<!-- 新規注文 -->
+<div class="page active" id="page-new">
   <div class="header">
-    <div class="header-icon">🎯</div>
-    <div>
-      <div class="header-title">7桁ハンター</div>
-      <div class="header-sub">YouTube概要欄・コメントから数字を収集</div>
+    <h1>⚡ NEW TRADE</h1>
+    <div class="sub">新しいトレードを設定</div>
+  </div>
+  <div class="card">
+    <div class="card-title">銘柄名</div>
+    <input type="text" id="trade-name" placeholder="例: 曙ブレーキ / 7238" maxlength="20">
+  </div>
+  <div class="card">
+    <div class="card-title">購入価格 / 株数</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>株価</span><span class="slider-value" id="price-val">200円</span></div>
+      <input type="range" id="price-slider" min="50" max="1000" value="200" step="1">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>株数</span><span class="slider-value" id="shares-val">100株</span></div>
+      <input type="range" id="shares-slider" min="100" max="2000" value="100" step="100">
+    </div>
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;text-align:center;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">投資額</div>
+      <div id="total-cost" style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--gold)">¥20,000</div>
     </div>
   </div>
-
-  <div class="section">
-    <div class="section-title">API設定</div>
-    <div class="field">
-      <label class="field-label">YouTube APIキー</label>
-      <div class="field-row">
-        <input type="password" id="apiKey" placeholder="AIza...">
-        <button class="icon-btn" id="toggleKeyBtn">👁</button>
-      </div>
+  <div class="card">
+    <div class="card-title">初期値モード</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="mode-tab-pct" onclick="setMode('pct')">📐 円幅指定</button>
+      <button class="mode-tab" id="mode-tab-amt" onclick="setMode('amt')">💰 金額指定</button>
+      <button class="mode-tab" id="mode-tab-manual" onclick="setMode('manual')">✏️ 手動</button>
     </div>
-    <div style="margin-top:12px; font-size:12px; color:var(--muted); display:flex; align-items:center; justify-content:space-between;">
-      <span>検索済みビデオ: <span id="historyCount">0</span>件</span>
-      <button onclick="resetHistory()" style="background:none; border:1px solid var(--border); color:var(--muted); font-size:10px; padding:2px 8px; border-radius:4px; cursor:pointer;">履歴リセット</button>
-    </div>
+    <div class="info-box" id="mode-desc">設定画面の「円幅」をもとに自動計算</div>
   </div>
-
-  <div class="section">
-    <div class="section-title">リンク先設定 (クリック時に開くサイト)</div>
-    <div class="field">
-      <label class="field-label">URL（改行で複数指定。優先順位順。{{NUM}} が数字に置き換わります）</label>
-      <textarea id="targetUrls" rows="3">https://www.google.com/search?q={{NUM}}
-https://www.dlsite.com/maniax/fsr/=/keyword/{{NUM}}</textarea>
+  <div class="card">
+    <div class="card-title">損切り / 利確ライン</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>📉 損切り</span><span class="slider-value" id="stop-val" style="color:var(--loss)">185円</span></div>
+      <input type="range" id="stop-slider" min="10" max="1500" value="185" step="1">
     </div>
+    <div class="diff-row" style="color:var(--loss)" id="stop-diff">-¥1,500</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>📈 利確</span><span class="slider-value" id="target-val" style="color:var(--win)">220円</span></div>
+      <input type="range" id="target-slider" min="10" max="1500" value="220" step="1">
+    </div>
+    <div class="diff-row" style="color:var(--win)" id="target-diff">+¥2,000</div>
   </div>
-
-  <div class="section">
-    <div class="section-title">検索設定</div>
-    <div class="field">
-      <label class="field-label">検索キーワード（複数は改行して入力）</label>
-      <textarea id="searchQuery" rows="5">7桁
-七桁
-伝説の7桁
-魔法の7桁
-殿堂入り 7桁</textarea>
-      <div style="font-size:10px; color:var(--muted); margin-top:4px;">※キーワード1つにつき検索APIを100pt消費します（1日合計10,000ptまで）。</div>
-    </div>
-    <div class="num-row">
-      <div class="num-field">
-        <label class="field-label">桁数</label>
-        <input type="number" id="digitCount" value="7" min="1" max="15">
-      </div>
-      <div class="num-field">
-        <label class="field-label">最大動画数</label>
-        <input type="number" id="maxVideos" value="10" min="1" max="50">
-      </div>
-      <div class="num-field">
-        <label class="field-label">コメント数</label>
-        <input type="number" id="maxComments" value="100" min="10" max="500">
-      </div>
-    </div>
-    <button class="run-btn" id="runBtn">▶ 収集スタート</button>
-  </div>
-
-  <div class="progress-section" id="progressBox">
-    <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
-    <div class="log-box" id="logArea"></div>
-  </div>
-
-  <div class="results-wrap" id="resultsWrap">
-    <div class="stats-grid" id="statsGrid"></div>
-
-    <div class="numlist-panel" id="favPanel" style="display:none; border-color:rgba(255,204,0,0.3); background:linear-gradient(to bottom, rgba(255,204,0,0.05), var(--surface));">
-      <div class="numlist-header">
-        <span class="numlist-title" style="color:var(--gold);">⭐ お気に入り数字（<span id="favCount">0</span>件）</span>
-      </div>
-      <div class="numlist-grid" id="favGrid"></div>
-    </div>
-
-    <div class="numlist-panel" id="numlistPanel" style="display:none">
-      <div class="numlist-header">
-        <span class="numlist-title">🔢 今まで収集した数字一覧（<span id="totalSavedCount">0</span>件）</span>
-        <button class="copy-all-btn" id="copyBtn">📋 全コピー</button>
-      </div>
-      <div class="numlist-grid" id="numlistGrid"></div>
-    </div>
-
-    <div class="tabs">
-      <button class="tab active" id="filterAll">すべて</button>
-      <button class="tab" id="filterDesc">📄 概要欄</button>
-      <button class="tab" id="filterComment">💬 コメント</button>
-      <button class="csv-tab">⬇ CSV</button>
-    </div>
-    <div id="resultsList"></div>
-  </div>
-
+  <button class="btn btn-primary" onclick="addTrade()">トレード追加 →</button>
 </div>
+
+<!-- 銘柄一覧 -->
+<div class="page" id="page-trades">
+  <div class="header">
+    <h1>📊 TRADES</h1>
+    <div class="sub">日付別トレード一覧</div>
+  </div>
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeDate(-1)">◀</button>
+    <div class="date-nav-center">
+      <div class="date-nav-label" id="date-nav-label">今日</div>
+      <div class="date-nav-pnl neu" id="date-nav-pnl">取引なし</div>
+    </div>
+    <button class="date-nav-btn" onclick="changeDate(1)">▶</button>
+  </div>
+  <div id="trades-list"></div>
+</div>
+
+<!-- カレンダー -->
+<div class="page" id="page-calendar">
+  <div class="header"><h1>📅 CALENDAR</h1><div class="sub">日別損益</div></div>
+  <div class="summary-grid">
+    <div class="summary-box"><div class="summary-label">今月 合計</div><div class="summary-val neu" id="monthly-total">¥0</div></div>
+    <div class="summary-box"><div class="summary-label">勝率</div><div class="summary-val neu" id="win-rate">-%</div></div>
+  </div>
+  <div class="card">
+    <div class="calendar-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">◀</button>
+      <div class="cal-title" id="cal-title"></div>
+      <button class="cal-nav" onclick="changeMonth(1)">▶</button>
+    </div>
+    <div class="cal-grid" id="cal-labels">
+      <div class="cal-day-label">日</div><div class="cal-day-label">月</div><div class="cal-day-label">火</div>
+      <div class="cal-day-label">水</div><div class="cal-day-label">木</div><div class="cal-day-label">金</div><div class="cal-day-label">土</div>
+    </div>
+    <div class="cal-grid" id="cal-days"></div>
+  </div>
+</div>
+
+<!-- 設定 -->
+<div class="page" id="page-settings">
+  <div class="header"><h1>⚙️ SETTINGS</h1><div class="sub">初期値 / 成績</div></div>
+  <div class="card">
+    <div class="card-title">📐 円幅モード（株価基準）</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>損切り幅</span><span class="slider-value" id="def-stop-val" style="color:var(--loss)">-15円</span></div>
+      <input type="range" id="def-stop" min="1" max="100" value="15" step="1" oninput="updateDefaults()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>利確幅</span><span class="slider-value" id="def-target-val" style="color:var(--win)">+20円</span></div>
+      <input type="range" id="def-target" min="1" max="200" value="20" step="1" oninput="updateDefaults()">
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 金額モード（損益額基準）</div>
+    <div class="slider-group">
+      <div class="slider-label"><span>許容損失額</span><span class="slider-value" id="def-loss-amt-val" style="color:var(--loss)">-200円</span></div>
+      <input type="range" id="def-loss-amt" min="100" max="10000" value="200" step="100" oninput="updateDefaults()">
+    </div>
+    <div class="slider-group">
+      <div class="slider-label"><span>目標利益額</span><span class="slider-value" id="def-profit-amt-val" style="color:var(--win)">+200円</span></div>
+      <input type="range" id="def-profit-amt" min="100" max="10000" value="200" step="100" oninput="updateDefaults()">
+    </div>
+  </div>
+  <button class="btn btn-danger" onclick="clearAll()">全データをリセット</button>
+</div>
+
+<nav class="nav">
+  <button class="active" id="nav-new" onclick="showPage('new', this)"><span class="icon">➕</span>新規</button>
+  <button id="nav-trades" onclick="showPage('trades', this)"><span class="icon">📊</span>銘柄</button>
+  <button id="nav-calendar" onclick="showPage('calendar', this)"><span class="icon">📅</span>カレンダー</button>
+  <button id="nav-settings" onclick="showPage('settings', this)"><span class="icon">⚙️</span>設定</button>
+</nav>
+
 <script>
-const BASE = 'https://www.googleapis.com/youtube/v3';
-let allResults = [];
-let currentFilter = 'all';
-let savedNumbers = new Set();
-let newlyFoundNumbers = new Set();
-let searchedVideoIds = new Set();
-let savedFavorites = new Set();
+let trades = JSON.parse(localStorage.getItem('trades2') || '[]');
+let settings = JSON.parse(localStorage.getItem('settings2') || JSON.stringify({
+  stopPct: 15, targetPct: 20, lossAmt: 200, profitAmt: 200
+}));
 
-function saveFavorites() {
-  try {
-    localStorage.setItem('yt_hunter_favs', JSON.stringify(Array.from(savedFavorites)));
-    renderResults();
-  } catch(e) { console.error('Favorites save error:', e); }
+let currentMode = 'pct';
+let currentDate = todayStr();
+let calMonth = new Date();
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+
+function formatDate(str) {
+  const d = new Date(str + 'T00:00:00');
+  return (d.getMonth()+1) + '月' + d.getDate() + '日（' + ['日','月','火','水','木','金','土'][d.getDay()] + '）';
 }
 
-function toggleFavorite(num, event) {
-  if (event) event.stopPropagation();
-  if (savedFavorites.has(num)) {
-    savedFavorites.delete(num);
-  } else {
-    savedFavorites.add(num);
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if (name === 'trades') renderTrades();
+  if (name === 'calendar') renderCalendar();
+  if (name === 'settings') renderSettings();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('mode-tab-' + mode).classList.add('active');
+  applyDefaults();
+}
+
+function initSliders() {
+  document.getElementById('price-slider').oninput = () => { applyDefaults(); updateCost(); };
+  document.getElementById('shares-slider').oninput = () => { applyDefaults(); updateCost(); };
+  document.getElementById('stop-slider').oninput = updateLines;
+  document.getElementById('target-slider').oninput = updateLines;
+  applyDefaults();
+  updateCost();
+}
+
+function applyDefaults() {
+  const price = +document.getElementById('price-slider').value;
+  const shares = +document.getElementById('shares-slider').value;
+  document.getElementById('price-val').textContent = price + '円';
+  document.getElementById('shares-val').textContent = shares + '株';
+
+  if (currentMode === 'pct') {
+    document.getElementById('stop-slider').value = Math.max(10, price - settings.stopPct);
+    document.getElementById('target-slider').value = price + settings.targetPct;
+  } else if (currentMode === 'amt') {
+    const sw = Math.floor(settings.lossAmt / shares);
+    const tw = Math.ceil(settings.profitAmt / shares);
+    document.getElementById('stop-slider').value = Math.max(10, price - Math.max(1, sw));
+    document.getElementById('target-slider').value = price + Math.max(1, tw);
   }
-  saveFavorites();
+  updateLines();
 }
 
-function saveSearchedVideos() {
-  try {
-    localStorage.setItem('yt_hunter_vids', JSON.stringify(Array.from(searchedVideoIds)));
-    document.getElementById('historyCount').textContent = searchedVideoIds.size;
-  } catch(e) { console.error('History save error:', e); }
+function updateLines() {
+  const p = +document.getElementById('price-slider').value;
+  const s = +document.getElementById('shares-slider').value;
+  const sv = +document.getElementById('stop-slider').value;
+  const tv = +document.getElementById('target-slider').value;
+  document.getElementById('stop-val').textContent = sv + '円';
+  document.getElementById('target-val').textContent = tv + '円';
+  document.getElementById('stop-diff').textContent = (sv < p ? '-' : '+') + '¥' + Math.abs((sv - p) * s).toLocaleString();
+  document.getElementById('target-diff').textContent = (tv > p ? '+' : '-') + '¥' + Math.abs((tv - p) * s).toLocaleString();
 }
 
-function resetHistory() {
-  if (confirm('検索済みの動画履歴をすべて消去しますか？')) {
-    searchedVideoIds.clear();
-    saveSearchedVideos();
-    alert('履歴をリセットしました。');
-  }
+function updateCost() {
+  const p = +document.getElementById('price-slider').value;
+  const s = +document.getElementById('shares-slider').value;
+  document.getElementById('total-cost').textContent = '¥' + (p * s).toLocaleString();
 }
 
-function openSitesForNumber(num) {
-  const urlText = document.getElementById('targetUrls').value.trim();
-  if (!urlText) {
-    window.open('https://www.google.com/search?q=' + encodeURIComponent(num), '_blank');
-    return;
-  }
-  const urls = urlText.split('\n').map(function(u){ return u.trim(); }).filter(function(u){ return u; });
-  urls.forEach(function(url) {
-    const finalUrl = url.replace(/{{NUM}}/g, encodeURIComponent(num));
-    window.open(finalUrl, '_blank');
-  });
-}
+// 修正ポイント②：バリデーションの追加
+function addTrade() {
+  const name = document.getElementById('trade-name').value.trim() || '銘柄' + (trades.length + 1);
+  const price = +document.getElementById('price-slider').value;
+  const shares = +document.getElementById('shares-slider').value;
+  const stop = +document.getElementById('stop-slider').value;
+  const target = +document.getElementById('target-slider').value;
 
-function toggleKey() {
-  const inp = document.getElementById('apiKey');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
+  if (stop >= price) { alert('損切り価格は買値より低く設定してください'); return; }
+  if (target <= price) { alert('利確価格は買値より高く設定してください'); return; }
 
-function log(msg, cls) {
-  const area = document.getElementById('logArea');
-  const line = document.createElement('div');
-  if (cls) line.className = cls;
-  line.textContent = msg;
-  area.appendChild(line);
-  area.scrollTop = area.scrollHeight;
-}
-
-function setProgress(pct) {
-  document.getElementById('progressBar').style.width = pct + '%';
-}
-
-function extractNumbers(text, digits) {
-  const re = new RegExp('(?<!\\d)\\d{' + digits + '}(?!\\d)', 'g');
-  return [...text.matchAll(re)].map(function(m){ return m[0]; });
-}
-
-function highlightNumbers(text, digits) {
-  const safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const re = new RegExp('(?<!\\d)(\\d{' + digits + '})(?!\\d)', 'g');
-  return safe.replace(re, '<a class="hl" onclick="openSitesForNumber(\'$1\')">$1</a>');
-}
-
-async function apiFetch(endpoint, params) {
-  const apiKey = document.getElementById('apiKey').value.trim();
-  const qs = new URLSearchParams(Object.assign({ key: apiKey }, params)).toString();
-  const res = await fetch(BASE + '/' + endpoint + '?' + qs);
-  if (!res.ok) {
-    const err = await res.json();
-    let msg = (err.error && err.error.message) || res.statusText;
-    if (msg.includes('quota')) {
-      msg = 'API利用制限（クォータ）を超過しました。YouTube APIは「1回の検索につき100ポイント」を消費するため、キーワード数が多いと早く制限に達します。数時間〜1日経つとリセットされます。';
-    }
-    throw new Error(msg);
-  }
-  return res.json();
-}
-
-async function searchVideos(query, maxVideos) {
-  const data = await apiFetch('search', {
-    q: query, part: 'snippet', type: 'video',
-    maxResults: Math.min(50, maxVideos), relevanceLanguage: 'ja'
-  });
-  return (data.items || []).filter(function(i){ return i.id.videoId; }).slice(0, maxVideos);
-}
-
-async function getDescription(videoId) {
-  const data = await apiFetch('videos', { id: videoId, part: 'snippet' });
-  return (data.items[0] && data.items[0].snippet && data.items[0].snippet.description) || '';
-}
-
-async function getComments(videoId, maxComments) {
-  const comments = [];
-  let pageToken = null;
-  try {
-    while (comments.length < maxComments) {
-      const params = { videoId: videoId, part: 'snippet', maxResults: Math.min(100, maxComments - comments.length), order: 'relevance' };
-      if (pageToken) params.pageToken = pageToken;
-      const data = await apiFetch('commentThreads', params);
-      for (const item of data.items) {
-        const s = item.snippet.topLevelComment.snippet;
-        comments.push({ text: s.textDisplay || '', likes: s.likeCount || 0 });
-      }
-      pageToken = data.nextPageToken;
-      if (!pageToken) break;
-    }
-  } catch(e) {}
-  return comments;
-}
-
-async function startHunt() {
-  saveSettings();
-  const apiKey = document.getElementById('apiKey').value.trim();
-  const queries = document.getElementById('searchQuery').value.trim().split('\n').map(function(q){ return q.trim(); }).filter(function(q){ return q; });
-  const digits = parseInt(document.getElementById('digitCount').value) || 7;
-  const maxVideos = parseInt(document.getElementById('maxVideos').value) || 10;
-  const maxComments = parseInt(document.getElementById('maxComments').value) || 100;
-
-  if (!apiKey) { alert('APIキーを入力してください'); return; }
-  if (!queries.length) { alert('検索キーワードを入力してください'); return; }
-
-  allResults = [];
-  newlyFoundNumbers.clear();
-  document.getElementById('runBtn').disabled = true;
-  document.getElementById('progressBox').classList.add('visible');
+  trades.unshift({ id: Date.now(), name, price, shares, stop, target, result: null, pnl: null, date: todayStr() });
+  save();
   
-  // Keep the list panel visible if we have saved numbers, but clear current search stats and results
-  if (savedNumbers.size > 0) {
-    document.getElementById('resultsWrap').classList.add('visible');
-    document.getElementById('statsGrid').innerHTML = ''; 
-  } else {
-    document.getElementById('resultsWrap').classList.remove('visible');
-  }
-  document.getElementById('resultsList').innerHTML = ''; 
-  document.getElementById('logArea').innerHTML = '';
-  setProgress(0);
-
-  try {
-    const seenIds = new Set();
-    const allVideos = [];
-    for (const query of queries) {
-      log('🔍 「' + query + '」で検索中...');
-      const vids = await searchVideos(query, maxVideos);
-      for (const v of vids) {
-        if (!seenIds.has(v.id.videoId)) {
-          seenIds.add(v.id.videoId);
-          allVideos.push(v);
-        }
-      }
-      log('  → ' + vids.length + '件発見', 'log-ok');
-    }
-    log('✅ 合計 ' + allVideos.length + '件の動画', 'log-ok');
-
-    let skippedCount = 0;
-    const processingVideos = [];
-    for (const v of allVideos) {
-      if (searchedVideoIds.has(v.id.videoId)) {
-        skippedCount++;
-      } else {
-        processingVideos.push(v);
-      }
-    }
-
-    if (skippedCount > 0) {
-      log('ℹ️ ' + skippedCount + '件の動画を履歴に基づいてスキップしました。', 'log-ok');
-    }
-
-    for (let i = 0; i < processingVideos.length; i++) {
-      const video = processingVideos[i];
-      const videoId = video.id.videoId;
-      const title = video.snippet.title;
-      const url = 'https://www.youtube.com/watch?v=' + videoId;
-      setProgress(Math.round((i / processingVideos.length) * 100));
-      log('[' + (i+1) + '/' + processingVideos.length + '] ' + title.slice(0,35) + '...');
-
-      const desc = await getDescription(videoId);
-      const descNums = extractNumbers(desc, digits);
-      if (descNums.length > 0) {
-        descNums.forEach(function(n) {
-          if (!savedNumbers.has(n)) newlyFoundNumbers.add(n);
-        });
-        log('  📄 概要欄: ' + descNums.join(', '), 'log-hit');
-        allResults.push({ source: 'desc', url: url, title: title, text: desc.slice(0,300), numbers: descNums, likes: null });
-      }
-
-      const comments = await getComments(videoId, maxComments);
-      let hits = 0;
-      for (const c of comments) {
-        const nums = extractNumbers(c.text, digits);
-        if (nums.length > 0) {
-          nums.forEach(function(n) {
-            if (!savedNumbers.has(n)) newlyFoundNumbers.add(n);
-          });
-          hits++;
-          allResults.push({ source: 'comment', url: url, title: title, text: c.text.slice(0,300), numbers: nums, likes: c.likes });
-        }
-      }
-      if (hits > 0) log('  💬 コメント ' + hits + '件ヒット', 'log-hit');
-
-      // Add to searched history
-      searchedVideoIds.add(videoId);
-
-      await new Promise(function(r){ setTimeout(r, 200); });
-    }
-
-    // Save history after hunt
-    saveSearchedVideos();
-
-    setProgress(100);
-    
-    // Save newly found numbers to persistent storage
-    if (newlyFoundNumbers.size > 0) {
-        newlyFoundNumbers.forEach(function(n) { savedNumbers.add(n); });
-        saveStoredNumbers();
-    }
-    
-    log('🏆 完了！' + allResults.length + '件ヒット (新規: ' + newlyFoundNumbers.size + '件)', 'log-ok');
-    renderResults();
-
-  } catch(e) {
-    log('❌ エラー: ' + e.message, 'log-err');
-  } finally {
-    document.getElementById('runBtn').disabled = false;
-  }
+  const btn = document.querySelector('.btn-primary');
+  btn.textContent = '✓ 追加しました'; btn.style.background = 'var(--win)';
+  setTimeout(() => { btn.textContent = 'トレード追加 →'; btn.style.background = ''; }, 1500);
 }
 
-function renderResults() {
-  const wrap = document.getElementById('resultsWrap');
-  const list = document.getElementById('resultsList');
-  const digits = parseInt(document.getElementById('digitCount').value) || 7;
-  wrap.classList.add('visible');
+function changeDate(dir) {
+  const d = new Date(currentDate + 'T00:00:00');
+  d.setDate(d.getDate() + dir);
+  currentDate = d.toISOString().split('T')[0];
+  renderTrades();
+}
 
-  const filtered = currentFilter === 'all' ? allResults : allResults.filter(function(r){ return r.source === currentFilter; });
-  const sorted = filtered.slice().sort(function(a,b){
-    if (a.source === 'desc' && b.source !== 'desc') return -1;
-    if (b.source === 'desc' && a.source !== 'desc') return 1;
-    return (b.likes || 0) - (a.likes || 0);
-  });
+function renderTrades() {
+  const dayTrades = trades.filter(t => t.date === currentDate);
+  const dayPnl = dayTrades.reduce((s, t) => s + (t.pnl || 0), 0);
+  const hasResult = dayTrades.some(t => t.result);
 
-  const totalDesc = allResults.filter(function(r){ return r.source === 'desc'; }).length;
-  const totalComment = allResults.filter(function(r){ return r.source === 'comment'; }).length;
-  const uniqNums = [...new Set(allResults.flatMap(function(r){ return r.numbers; }))].sort();
+  document.getElementById('date-nav-label').textContent = currentDate === todayStr() ? '今日 ' + formatDate(currentDate) : formatDate(currentDate);
+  const pnlEl = document.getElementById('date-nav-pnl');
+  pnlEl.textContent = hasResult ? (dayPnl >= 0 ? '+' : '') + '¥' + dayPnl.toLocaleString() : (dayTrades.length ? '未決定' : '取引なし');
+  pnlEl.className = 'date-nav-pnl ' + (hasResult ? (dayPnl > 0 ? 'pos' : dayPnl < 0 ? 'neg' : 'neu') : 'neu');
 
-  document.getElementById('statsGrid').innerHTML =
-    '<div class="stat-card"><div class="stat-num">' + allResults.length + '</div><div class="stat-name">総ヒット</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + uniqNums.length + '</div><div class="stat-name">ユニーク数字</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + totalDesc + '</div><div class="stat-name">概要欄</div></div>' +
-    '<div class="stat-card"><div class="stat-num">' + totalComment + '</div><div class="stat-name">コメント</div></div>';
-
-  // 数字一覧（これまでに保存されたすべての数字）
-  const numPanel = document.getElementById('numlistPanel');
-  const numGrid = document.getElementById('numlistGrid');
-  const countSpan = document.getElementById('totalSavedCount');
-  
-  if (savedNumbers.size > 0) {
-    numPanel.style.display = 'block';
-    countSpan.textContent = savedNumbers.size;
-    const allSavedArr = Array.from(savedNumbers).sort();
-    numGrid.innerHTML = allSavedArr.map(function(n){ 
-      const isNewClass = newlyFoundNumbers.has(n) ? ' is-new' : '';
-      const newLabel = newlyFoundNumbers.has(n) ? ' <span style="font-size:10px;color:#ffcc00;">[NEW]</span>' : '';
-      const isFav = savedFavorites.has(n);
-      return '<div class="numlist-pill' + isNewClass + '" onclick="openSitesForNumber(\'' + n + '\')">' + 
-             '<span>' + n + newLabel + '</span>' +
-             '<span class="fav-btn' + (isFav ? ' active' : '') + '" onclick="toggleFavorite(\'' + n + '\', event)">' + (isFav ? '★' : '☆') + '</span>' +
-             '</div>'; 
-    }).join('');
-  } else {
-    numPanel.style.display = 'none';
-  }
-
-  // お気に入り一覧
-  const favPanel = document.getElementById('favPanel');
-  const favGrid = document.getElementById('favGrid');
-  const favCountSpan = document.getElementById('favCount');
-
-  if (savedFavorites.size > 0) {
-    favPanel.style.display = 'block';
-    favCountSpan.textContent = savedFavorites.size;
-    const allFavArr = Array.from(savedFavorites).sort();
-    favGrid.innerHTML = allFavArr.map(function(n){ 
-      return '<div class="numlist-pill" onclick="openSitesForNumber(\'' + n + '\')">' + 
-             '<span>' + n + '</span>' +
-             '<span class="fav-btn active" onclick="toggleFavorite(\'' + n + '\', event)">★</span>' +
-             '</div>'; 
-    }).join('');
-  } else {
-    favPanel.style.display = 'none';
-  }
-
-  if (sorted.length === 0) {
-    list.innerHTML = '<div class="empty">該当する' + digits + '桁の数字が<br>見つかりませんでした</div>';
+  const list = document.getElementById('trades-list');
+  if (!dayTrades.length) {
+    list.innerHTML = '<div class="empty-state">取引がありません</div>';
     return;
   }
 
-  list.innerHTML = sorted.map(function(r, i){
-    return '<div class="result-card" style="animation-delay:' + (i*0.03) + 's">' +
-      '<div class="card-top">' +
-        '<span class="badge ' + (r.source === 'desc' ? 'badge-desc' : 'badge-comment') + '">' + (r.source === 'desc' ? '概要欄' : 'コメント') + '</span>' +
-        '<div class="card-video-title"><a href="' + r.url + '" target="_blank">' + r.title + '</a></div>' +
-      '</div>' +
-      '<div class="card-text">' + highlightNumbers(r.text, digits) + '</div>' +
-      '<div class="card-nums">' +
-        r.numbers.map(function(n){ 
-          const isNewClass = newlyFoundNumbers.has(n) ? ' is-new' : '';
-          const newLabel = newlyFoundNumbers.has(n) ? ' <span style="font-size:10px;color:#ffcc00;">[NEW]</span>' : '';
-          const isFav = savedFavorites.has(n);
-          return '<div class="num-pill' + isNewClass + '" onclick="openSitesForNumber(\'' + n + '\')" style="display:inline-flex; align-items:center; cursor:pointer;">' + 
-                 '<span>' + n + newLabel + '</span>' +
-                 '<span class="fav-btn' + (isFav ? ' active' : '') + '" onclick="toggleFavorite(\'' + n + '\', event)">' + (isFav ? '★' : '☆') + '</span>' +
-                 '</div>'; 
-        }).join('') +
-        (r.likes !== null ? '<span class="likes-chip">👍 ' + Number(r.likes).toLocaleString() + '</span>' : '') +
-      '</div>' +
-    '</div>';
-  }).join('');
+  list.innerHTML = dayTrades.map(t => `
+    <div class="trade-card ${t.result || ''}">
+      <div class="trade-name">${t.name}</div>
+      <div class="trade-info">${t.price}円 × ${t.shares}株</div>
+      <div class="trade-targets">
+        <div class="target-box"><div class="target-label">損切</div><div class="target-val loss">${t.stop}</div></div>
+        <div class="target-box"><div class="target-label">買値</div><div class="target-val">${t.price}</div></div>
+        <div class="target-box"><div class="target-label">利確</div><div class="target-val win">${t.target}</div></div>
+      </div>
+      ${t.result ? `<div class="result-badge ${t.result}">${t.result === 'win' ? '✅' : '❌'} ¥${Math.abs(t.pnl).toLocaleString()}</div>` : 
+      `<div class="result-btns">
+        <button class="result-btn win-btn" onclick="setResult(${t.id},'win')">✅</button>
+        <button class="result-btn loss-btn" onclick="setResult(${t.id},'loss')">❌</button>
+      </div>`}
+      <button style="margin-top:8px;width:100%;background:none;border:none;color:var(--muted);font-size:10px;" onclick="deleteTrade(${t.id})">削除</button>
+    </div>
+  `).join('');
 }
 
-function filterResults(type) {
-  currentFilter = type;
-  document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('filter' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
-  renderResults();
+function setResult(id, res) {
+  const t = trades.find(t => t.id === id);
+  t.result = res;
+  t.pnl = res === 'win' ? (t.target - t.price) * t.shares : (t.stop - t.price) * t.shares;
+  save(); renderTrades();
 }
 
-function copyAllNums() {
-  const allSavedArr = Array.from(savedNumbers).sort();
-  if (!allSavedArr.length) return;
-  navigator.clipboard.writeText(allSavedArr.join('\n')).then(function(){
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✅ コピー済み';
-    setTimeout(function(){ btn.textContent = '📋 全コピー'; }, 2000);
+function deleteTrade(id) { if(confirm('削除しますか？')) { trades = trades.filter(t => t.id !== id); save(); renderTrades(); } }
+
+// 修正ポイント④：カレンダータップで日付移動
+function jumpToDate(dateStr) {
+  currentDate = dateStr;
+  showPage('trades', document.getElementById('nav-trades'));
+}
+
+function renderCalendar() {
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  document.getElementById('cal-title').textContent = `${y}年${m+1}月`;
+  const dayMap = {};
+  trades.forEach(t => { if(t.result) dayMap[t.date] = (dayMap[t.date] || 0) + t.pnl; });
+
+  let monthTotal = 0, winDays = 0, lossDays = 0;
+  const monthKey = `${y}-${String(m+1).padStart(2,'0')}`;
+  Object.entries(dayMap).forEach(([d, p]) => {
+    if(d.startsWith(monthKey)) { monthTotal += p; if(p>0) winDays++; else if(p<0) lossDays++; }
   });
+
+  const mtEl = document.getElementById('monthly-total');
+  mtEl.textContent = '¥' + monthTotal.toLocaleString();
+  mtEl.className = 'summary-val ' + (monthTotal > 0 ? 'pos' : monthTotal < 0 ? 'neg' : 'neu');
+  document.getElementById('win-rate').textContent = (winDays+lossDays) ? Math.round(winDays/(winDays+lossDays)*100)+'%' : '-%';
+
+  const first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
+  let html = '';
+  for (let i = 0; i < first; i++) html += '<div></div>';
+  for (let d = 1; d <= last; d++) {
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const p = dayMap[ds];
+    html += `<div class="cal-day ${p !== undefined ? (p > 0 ? 'win-day' : 'loss-day') : ''} ${ds === todayStr() ? 'today' : ''}" onclick="jumpToDate('${ds}')">
+      <div class="day-num">${d}</div>
+      ${p !== undefined ? `<div class="day-pnl ${p>0?'pos':'neg'}">${p>0?'+':''}${Math.round(p/1000)}k</div>` : ''}
+    </div>`;
+  }
+  document.getElementById('cal-days').innerHTML = html;
 }
 
-function downloadCSV() {
-  if (!allResults.length) return;
-  const headers = ['ソース','動画URL','タイトル','テキスト','数字','いいね数'];
-  const rows = allResults.map(function(r){
-    return [
-      r.source === 'desc' ? '概要欄' : 'コメント',
-      r.url, r.title,
-      r.text.replace(/"/g,'""'),
-      r.numbers.join(', '),
-      r.likes != null ? r.likes : ''
-    ];
-  });
-  const csv = [headers].concat(rows).map(function(r){ return r.map(function(v){ return '"' + v + '"'; }).join(','); }).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'youtube_hunter_' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
+function changeMonth(dir) { calMonth.setMonth(calMonth.getMonth() + dir); renderCalendar(); }
+
+function updateDefaults() {
+  settings.stopPct = +document.getElementById('def-stop').value;
+  settings.targetPct = +document.getElementById('def-target').value;
+  settings.lossAmt = +document.getElementById('def-loss-amt').value;
+  settings.profitAmt = +document.getElementById('def-profit-amt').value;
+  document.getElementById('def-stop-val').textContent = `-${settings.stopPct}円`;
+  document.getElementById('def-target-val').textContent = `+${settings.targetPct}円`;
+  document.getElementById('def-loss-amt-val').textContent = `-¥${settings.lossAmt}`;
+  document.getElementById('def-profit-amt-val').textContent = `+¥${settings.profitAmt}`;
+  save();
 }
 
-function loadSettings() {
-  try {
-    const keys = ['apiKey', 'searchQuery', 'digitCount', 'maxVideos', 'maxComments', 'targetUrls'];
-    keys.forEach(function(key) {
-      const val = localStorage.getItem('yt_hunter_' + key);
-      if (val !== null) {
-        document.getElementById(key).value = val;
-      }
-    });
-
-    // Load stored numbers
-    const storedNums = localStorage.getItem('yt_hunter_numbers');
-    if (storedNums) {
-      const parsedNums = JSON.parse(storedNums);
-      if (Array.isArray(parsedNums)) {
-        savedNumbers = new Set(parsedNums);
-        renderResults(); // This will show the numbers in the list immediately on load
-      }
-    }
-
-    // Load searched video history
-    const storedVids = localStorage.getItem('yt_hunter_vids');
-    if (storedVids) {
-      const parsedVids = JSON.parse(storedVids);
-      if (Array.isArray(parsedVids)) {
-        searchedVideoIds = new Set(parsedVids);
-        document.getElementById('historyCount').textContent = searchedVideoIds.size;
-      }
-    }
-
-    // Load favorites
-    const storedFavs = localStorage.getItem('yt_hunter_favs');
-    if (storedFavs) {
-      const parsedFavs = JSON.parse(storedFavs);
-      if (Array.isArray(parsedFavs)) {
-        savedFavorites = new Set(parsedFavs);
-        renderResults();
-      }
-    }
-  } catch (e) { console.error('Settings load error:', e); }
+function renderSettings() {
+  document.getElementById('def-stop').value = settings.stopPct;
+  document.getElementById('def-target').value = settings.targetPct;
+  document.getElementById('def-loss-amt').value = settings.lossAmt;
+  document.getElementById('def-profit-amt').value = settings.profitAmt;
+  updateDefaults();
 }
 
-function saveStoredNumbers() {
-  try {
-    localStorage.setItem('yt_hunter_numbers', JSON.stringify(Array.from(savedNumbers)));
-  } catch(e) { console.error('Numbers save error:', e); }
-}
+function clearAll() { if(confirm('リセットしますか？')) { trades = []; save(); location.reload(); } }
+function save() { localStorage.setItem('trades2', JSON.stringify(trades)); localStorage.setItem('settings2', JSON.stringify(settings)); }
 
-function saveSettings() {
-  try {
-    const keys = ['apiKey', 'searchQuery', 'digitCount', 'maxVideos', 'maxComments', 'targetUrls'];
-    keys.forEach(function(key) {
-      localStorage.setItem('yt_hunter_' + key, document.getElementById(key).value);
-    });
-  } catch (e) { console.error('Settings save error:', e); }
-}
-
-// Attach all event listeners after DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-  loadSettings();
-  const keys = ['apiKey', 'searchQuery', 'digitCount', 'maxVideos', 'maxComments', 'targetUrls'];
-  keys.forEach(function(key) {
-    const el = document.getElementById(key);
-    if (el) {
-      el.addEventListener('input', saveSettings);
-      el.addEventListener('change', saveSettings);
-    }
-  });
-  window.addEventListener('beforeunload', saveSettings);
-
-  document.getElementById('toggleKeyBtn').addEventListener('click', toggleKey);
-  document.getElementById('runBtn').addEventListener('click', startHunt);
-  document.getElementById('copyBtn').addEventListener('click', copyAllNums);
-  document.querySelector('.csv-tab').addEventListener('click', downloadCSV);
-  document.getElementById('filterAll').addEventListener('click', function(){ filterResults('all'); });
-  document.getElementById('filterDesc').addEventListener('click', function(){ filterResults('desc'); });
-  document.getElementById('filterComment').addEventListener('click', function(){ filterResults('comment'); });
-});
+initSliders();
 </script>
 </body>
 </html>
