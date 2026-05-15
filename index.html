@@ -322,9 +322,15 @@ let currentMode = 'pct';
 let currentDate = todayStr();
 let calMonth = new Date();
 
-function todayStr() { 
-  // 土日の場合は直前の金曜日にするなどの調整はあえてせず、表示時に飛ばす仕様
-  return new Date().toISOString().split('T')[0]; 
+function dateToStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function todayStr() {
+  return dateToStr(new Date());
 }
 
 function formatDate(str) {
@@ -391,22 +397,18 @@ function addTrade() {
   if (sv >= p || tv <= p) { alert('価格設定が正しくありません'); return; }
   const name = document.getElementById('trade-name').value.trim() || '銘柄' + (trades.length + 1);
   trades.unshift({ id: Date.now(), name, price: p, shares: s, stop: sv, target: tv, result: null, pnl: null, date: todayStr() });
-  save(); 
+  save();
   const btn = document.querySelector('.btn-primary');
   btn.textContent = '✓ 追加完了'; btn.style.background = 'var(--win)';
   setTimeout(() => { btn.textContent = 'トレード追加 →'; btn.style.background = ''; }, 1500);
 }
 
-// 修正：土日をスキップする日付増減ロジック
 function changeDate(dir) {
   let d = new Date(currentDate + 'T00:00:00');
-  
-  // 1日ずつ進め/戻し、土日だったらさらに繰り返す
   do {
     d.setDate(d.getDate() + dir);
-  } while (d.getDay() === 0 || d.getDay() === 6); // 0は日曜日、6は土曜日
-
-  currentDate = d.toISOString().split('T')[0];
+  } while (d.getDay() === 0 || d.getDay() === 6);
+  currentDate = dateToStr(d);
   renderTrades();
 }
 
@@ -414,12 +416,12 @@ function renderTrades() {
   const dayTrades = trades.filter(t => t.date === currentDate);
   const dayPnl = dayTrades.reduce((s, t) => s + (t.pnl || 0), 0);
   const hasResult = dayTrades.some(t => t.result);
-  
+
   document.getElementById('date-nav-label').textContent = currentDate === todayStr() ? '今日 ' + formatDate(currentDate) : formatDate(currentDate);
   const pnlEl = document.getElementById('date-nav-pnl');
   pnlEl.textContent = hasResult ? (dayPnl >= 0 ? '+' : '') + '¥' + dayPnl.toLocaleString() : (dayTrades.length ? '未決定' : '取引なし');
   pnlEl.className = 'date-nav-pnl ' + (hasResult ? (dayPnl > 0 ? 'pos' : dayPnl < 0 ? 'neg' : 'neu') : 'neu');
-  
+
   const list = document.getElementById('trades-list');
   if (!dayTrades.length) { list.innerHTML = '<div class="empty-state">取引なし</div>'; return; }
   list.innerHTML = dayTrades.map(t => `
@@ -431,7 +433,7 @@ function renderTrades() {
         <div class="target-box"><div class="target-label">買値</div><div class="target-val">${t.price}</div></div>
         <div class="target-box"><div class="target-label">利確</div><div class="target-val win">${t.target}</div></div>
       </div>
-      ${t.result ? `<div class="result-badge ${t.result}">${t.result==='win'?'✅':'❌'} ¥${Math.abs(t.pnl).toLocaleString()}</div>` : 
+      ${t.result ? `<div class="result-badge ${t.result}">${t.result==='win'?'✅':'❌'} ¥${Math.abs(t.pnl).toLocaleString()}</div>` :
       `<div class="result-btns"><button class="result-btn win-btn" onclick="setResult(${t.id},'win')">✅</button><button class="result-btn loss-btn" onclick="setResult(${t.id},'loss')">❌</button></div>`}
       <button style="width:100%;background:none;border:none;color:var(--muted);font-size:10px;margin-top:8px" onclick="deleteTrade(${t.id})">削除</button>
     </div>`).join('');
